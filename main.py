@@ -25,30 +25,44 @@ def find_post(id):
         if p["id"] == id:
             return p
         
+def find_index(id):
+    for i, p in enumerate(my_posts):
+        if p["id"] == id:
+            return i
+        
 @app.get("/")  # home route
 def root():
     return {"message" : "Hello World"}
 
-@app.get("/posts")  # route
+@app.get("/posts", )  # route
 def get_posts():
     return {"data": my_posts}
 
 @app.get("/posts/{id}")                       #path with path parameter
-def get_post(id: int, response : Response ):  #path operation function
+def get_post(id: int):  #path operation function
     post = find_post(id)
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Post with the id '{id}' was not found")
-        # response.status_code = status.HTTP_404_NOT_FOUND
-        # return {"msg": f"Post with the id '{id}' was not found"}
     return {"post detail": post}
 
 
-@app.post("/posts")
+@app.post("/posts", status_code=status.HTTP_201_CREATED)
 def create_post(post: Post):  #path operation function
     post_dict = post.dict()
     post_dict["id"] = randrange(0, 100000)
     my_posts.append(post_dict)
     return {"data": my_posts}
     
-
+@app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(id: int):
+    index = find_index(id)
+    
+    if index == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                            detail=f"Post does not exist")
+    my_posts.pop(index)
+    
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    
+    
