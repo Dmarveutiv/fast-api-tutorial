@@ -42,16 +42,6 @@ class Post(BaseModel):
     content : str
     published : bool = True
 
-    
-def find_post(id):
-    for p in my_posts:
-        if p["id"] == id:
-            return p
-        
-def find_index(id):
-    for i, p in enumerate(my_posts):
-        if p["id"] == id:
-            return i
         
 @app.get("/")  # home route
 def root():
@@ -97,16 +87,17 @@ def delete_post(id: int):
 
 @app.put("/posts/{id}")
 def update_post(id: int, post: Post):
-    index = find_index(id)
+    cursor.execute(""" UPDATE posts SET title = %s, content = %s, published = %s
+                    WHERE id = %s RETURNING * """, 
+                    (post.title, post.content, post.published, id))
+    updated_post = cursor.fetchone()
+    conn.commit()
     
-    if index == None:
+    if updated_post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail=f"Post does not exist")
-    post_dict = post.dict()
-    post_dict['id'] = id
-    my_posts[index] = post_dict
         
-    return {"data": post_dict}
+    return {"data": updated_post}
     
     
     
