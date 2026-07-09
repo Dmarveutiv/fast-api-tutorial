@@ -11,7 +11,12 @@ from psycopg2.extras import RealDictCursor
 app = FastAPI()
 
 try:
-    conn = psycopg2.connect(host='localhost', database='fastapi', user='postgres', password=2005)
+    conn = psycopg2.connect(host='localhost', database='fastapi', user='postgres', password=2005, cursor_factory=RealDictCursor)
+    cursor = conn.cursor()
+    print("Succesfully conected to database")
+except Exception as error:
+    print("failed to connect to database")
+    print("Error:", error)
     
     
     
