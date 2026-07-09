@@ -68,7 +68,8 @@ def get_posts():
 
 @app.get("/posts/{id}")                       #path with path parameter
 def get_post(id: int):  #path operation function
-    post = find_post(id)
+    cursor.execute(""" SELECT * FROM posts WHERE id = %s """, (id,))
+    post = cursor.fetchone()
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Post with the id '{id}' was not found")
