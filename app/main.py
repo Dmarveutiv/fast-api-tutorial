@@ -5,13 +5,24 @@ from typing import Optional
 from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import os
+from dotenv import load_dotenv
 
 
 
 app = FastAPI()
+load_dotenv()
+
+db_pass=os.getenv('DB_pass')
+db_host=os.getenv('DB_host')
+db_user=os.getenv('DB_user')
 
 try:
-    conn = psycopg2.connect(host='localhost', database='fastapi', user='postgres', password=2005, cursor_factory=RealDictCursor)
+    conn = psycopg2.connect(host=db_host,
+                            database='fastapi',
+                            user=db_user,
+                            password=db_pass, 
+                            cursor_factory=RealDictCursor)
     cursor = conn.cursor()
     print("Succesfully conected to database")
 except Exception as error:
