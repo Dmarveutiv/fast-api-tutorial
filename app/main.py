@@ -7,7 +7,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 import os
 from dotenv import load_dotenv
-
+import time
 
 
 app = FastAPI()
@@ -18,17 +18,20 @@ db_host=os.getenv('DB_host')
 db_user=os.getenv('DB_user')
 db=os.getenv('DB')
 
-try:
-    conn = psycopg2.connect(host=db_host,
+while True:
+    try:
+        conn = psycopg2.connect(host=db_host,
                             database=db,
                             user=db_user,
                             password=db_pass, 
                             cursor_factory=RealDictCursor)
-    cursor = conn.cursor()
-    print("Succesfully conected to database")
-except Exception as error:
-    print("failed to connect to database")
-    print("Error:", error)
+        cursor = conn.cursor()
+        print("Succesfully conected to database")
+        break
+    except Exception as error:
+         print("failed to connect to database")
+         print("Error:", error)
+         time.sleep(3)
     
     
     
@@ -59,7 +62,9 @@ def root():
 
 @app.get("/posts", )  # route
 def get_posts():
-    return {"data": my_posts}
+    cursor.execute(""" SELECT * FROM posts """)
+    posts = cursor.fetchall()
+    return {"data": posts}
 
 @app.get("/posts/{id}")                       #path with path parameter
 def get_post(id: int):  #path operation function
@@ -72,10 +77,13 @@ def get_post(id: int):  #path operation function
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
 def create_post(post: Post):  #path operation function
-    post_dict = post.dict()
-    post_dict["id"] = randrange(0, 100000)
-    my_posts.append(post_dict)
-    return {"data": my_posts}
+    cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s,%s,%s) RETURNING * """, 
+                   (post.title, post.content, post.published))
+    new_post = cursor.fetchone()
+    
+    conn.commit()
+    
+    return {"data": new_post}
     
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int):
