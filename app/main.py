@@ -1,8 +1,5 @@
 from fastapi import FastAPI, Response, status, HTTPException
-from fastapi.params import Body
 from pydantic import BaseModel
-from typing import Optional
-from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import os
@@ -25,7 +22,7 @@ while True:
                             user=db_user,
                             password=db_pass, 
                             cursor_factory=RealDictCursor)
-        cursor = conn.cursor()
+        cursor = conn.cursor()   #allows us to run sql queries
         print("Succesfully conected to database")
         break
     except Exception as error:
@@ -88,12 +85,13 @@ def create_post(post: Post):  #path operation function
     
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int):
-    index = find_index(id)
-    
-    if index == None:
+    cursor.execute(""" DELETE FROM posts WHERE id =%s RETURNING * """, (id,))
+    deleted_post = cursor.fetchone()
+    conn.commit()
+
+    if deleted_post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail=f"Post does not exist")
-    my_posts.pop(index)
     
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
