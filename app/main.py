@@ -16,10 +16,11 @@ load_dotenv()
 db_pass=os.getenv('DB_pass')
 db_host=os.getenv('DB_host')
 db_user=os.getenv('DB_user')
+db=os.getenv('DB')
 
 try:
     conn = psycopg2.connect(host=db_host,
-                            database='fastapi',
+                            database=db,
                             user=db_user,
                             password=db_pass, 
                             cursor_factory=RealDictCursor)
