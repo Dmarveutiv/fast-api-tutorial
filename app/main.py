@@ -3,22 +3,28 @@ from fastapi.params import Body
 from pydantic import BaseModel
 from typing import Optional
 from random import randrange
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 
 
 app = FastAPI()
 
-my_posts = [{"title" : "My first post", "content" : "This is my first post", "id" : 1, "date":"april 2026"}, 
-            {"title": "My 2nd post", "content": "This is my 2nd post", "id": 2, "date":"june 2026"},
-            {"title": "My 3rd post", "content": "This is my third post", "id": 3, "date":"may 2026"}]
+try:
+    conn = psycopg2.connect(host='localhost', database='fastapi', user='postgres', password=2005)
+    
+    
+    
+my_posts = [{"title" : "My first post", "content" : "This is my first post", "id" : 1,}, 
+            {"title": "My 2nd post", "content": "This is my 2nd post", "id": 2,},
+            {"title": "My 3rd post", "content": "This is my third post", "id": 3,}]
 
 
 class Post(BaseModel):
     title : str
     content : str
-    date : str
     published : bool = True
-    rating : Optional[int] = None
+
     
 def find_post(id):
     for p in my_posts:
