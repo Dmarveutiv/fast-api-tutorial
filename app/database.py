@@ -13,4 +13,6 @@ db=os.getenv('DB')
 
 SQLALCHEMY_DATABASE_URL = f'postgresql://{db_user}:{db_pass}@{db_host}/{db}'
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(SQLALCHEMY_DATABASE_URL)  #connect orm to db
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine) #connect orm to py app
