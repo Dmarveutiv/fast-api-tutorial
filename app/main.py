@@ -6,7 +6,7 @@ from psycopg2.extras import RealDictCursor
 import os
 from dotenv import load_dotenv
 import time
-from app.database import engine, SessionLocal, get_db
+from app.database import engine, get_db
 from sqlalchemy.orm import Session
 
 
@@ -51,13 +51,14 @@ def root():
     return {"message" : "Hello World"}
 
 @app.get("/sql")
-def test_posts(db: Session = Depends(get_db)):
-    return {"Status": "Success"}
+def test_post(db: Session = Depends(get_db)):
+    pass
 
 @app.get("/posts", )  # route
-def get_posts():
-    cursor.execute(""" SELECT * FROM posts """)
-    posts = cursor.fetchall()
+def get_posts(db: Session = Depends(get_db)):
+    # cursor.execute(""" SELECT * FROM posts """)
+    # posts = cursor.fetchall()
+    posts = db.query(models.Post).all()
     return {"data": posts}
 
 @app.get("/posts/{id}")                       #path with path parameter
