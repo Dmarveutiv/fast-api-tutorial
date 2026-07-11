@@ -1,3 +1,4 @@
+from app import models
 from fastapi import FastAPI, Response, status, HTTPException
 from pydantic import BaseModel
 import psycopg2
@@ -5,9 +6,15 @@ from psycopg2.extras import RealDictCursor
 import os
 from dotenv import load_dotenv
 import time
+from app.database import engine
 
+
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+
 load_dotenv()
 
 db_pass=os.getenv('DB_pass')
@@ -30,11 +37,6 @@ while True:
          print("Error:", error)
          time.sleep(3)
     
-    
-    
-my_posts = [{"title" : "My first post", "content" : "This is my first post", "id" : 1,}, 
-            {"title": "My 2nd post", "content": "This is my 2nd post", "id": 2,},
-            {"title": "My 3rd post", "content": "This is my third post", "id": 3,}]
 
 
 class Post(BaseModel):
