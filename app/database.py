@@ -18,3 +18,10 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL)  #connect orm to db
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine) #connect orm to py app
 
 Base = declarative_base()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

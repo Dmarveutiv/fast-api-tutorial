@@ -1,25 +1,19 @@
 from app import models
-from fastapi import FastAPI, Response, status, HTTPException
+from fastapi import FastAPI, Response, status, HTTPException, Depends
 from pydantic import BaseModel
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import os
 from dotenv import load_dotenv
 import time
-from app.database import engine, SessionLocal
+from app.database import engine, SessionLocal, get_db
+from sqlalchemy.orm import Session
 
 
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 load_dotenv()
@@ -55,6 +49,10 @@ class Post(BaseModel):
 @app.get("/")  # home route
 def root():
     return {"message" : "Hello World"}
+
+@app.get("/sql")
+def test_posts(db: Session = Depends(get_db)):
+    return {"Status": "Success"}
 
 @app.get("/posts", )  # route
 def get_posts():
