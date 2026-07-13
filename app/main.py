@@ -1,4 +1,4 @@
-from app import models
+from app import models, schemas
 from fastapi import FastAPI, Response, status, HTTPException, Depends
 from pydantic import BaseModel
 import psycopg2
@@ -23,36 +23,25 @@ db_host=os.getenv('DB_host')
 db_user=os.getenv('DB_user')
 db=os.getenv('DB')
 
-while True:
-    try:
-        conn = psycopg2.connect(host=db_host,
-                            database=db,
-                            user=db_user,
-                            password=db_pass, 
-                            cursor_factory=RealDictCursor)
-        cursor = conn.cursor()   #allows us to run sql queries
-        print("Succesfully conected to database")
-        break
-    except Exception as error:
-         print("failed to connect to database")
-         print("Error:", error)
-         time.sleep(3)
-    
-
-
-class Post(BaseModel):
-    title : str
-    content : str
-    published : bool = True
+# while True:
+#     try:
+#         conn = psycopg2.connect(host=db_host,
+#                             database=db,
+#                             user=db_user,
+#                             password=db_pass, 
+#                             cursor_factory=RealDictCursor)
+#         cursor = conn.cursor()   #allows us to run sql queries
+#         print("Succesfully conected to database")
+#         break
+#     except Exception as error:
+#          print("failed to connect to database")
+#          print("Error:", error)
+#          time.sleep(3)
 
         
 @app.get("/")  # home route
 def root():
     return {"message" : "Hello World"}
-
-@app.get("/sql")
-def test_post(db: Session = Depends(get_db)):
-    pass
 
 @app.get("/posts", )  # route
 def get_posts(db: Session = Depends(get_db)):
@@ -73,7 +62,7 @@ def get_post(id: int, db : Session = Depends(get_db)):  #path operation function
 
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_post(post: Post, db: Session = Depends(get_db)):  #path operation function
+def create_post(post: schemas.PostCreate, db: Session = Depends(get_db)):  #path operation function
     # cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s,%s,%s) RETURNING * """, 
     #                (post.title, post.content, post.published))
     # new_post = cursor.fetchone()
@@ -102,7 +91,7 @@ def delete_post(id: int, db : Session = Depends(get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 @app.put("/posts/{id}")
-def update_post(id: int, post: Post, db : Session = Depends(get_db)):
+def update_post(id: int, post: schemas.PostCreate, db : Session = Depends(get_db)):
     # cursor.execute(""" UPDATE posts SET title = %s, content = %s, published = %s
     #                 WHERE id = %s RETURNING * """, 
     #                 (post.title, post.content, post.published, id))
