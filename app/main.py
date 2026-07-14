@@ -8,20 +8,22 @@ import time
 from app.database import engine, get_db
 from sqlalchemy.orm import Session
 from typing import List
+from passlib.context import CryptContext
+from pwdlib import PasswordHash
 
 
-
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 
-load_dotenv()
+# load_dotenv()
 
-db_pass=os.getenv('DB_pass')
-db_host=os.getenv('DB_host')
-db_user=os.getenv('DB_user')
-db=os.getenv('DB')
+# db_pass=os.getenv('DB_pass')
+# db_host=os.getenv('DB_host')
+# db_user=os.getenv('DB_user')
+# db=os.getenv('DB')
 
 # while True:
 #     try:
@@ -109,6 +111,18 @@ def update_post(id: int, post: schemas.PostCreate, db : Session = Depends(get_db
     db.commit()
         
     return post_query.first()
+
+@app.post("/users", status_code=status.HTTP_201_CREATED, response_model=schemas.User)  
+def create_user( user: schemas.UserCreate,     db: Session = Depends(get_db)):
     
+    # hashed_password =  pwd_context.hash(user.password[:72])
+    # user.password = hashed_password
+    password_hash = PasswordHash.recommended()
+    user.password = password_hash.hash(user.password)
+    new_user = models.User(**user.dict())
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
     
+    return new_user
     
