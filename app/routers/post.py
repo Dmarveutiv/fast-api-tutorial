@@ -12,14 +12,16 @@ router = APIRouter(
 
 
 @router.get("/", response_model=List[schemas.Post])  # route
-def get_posts(db: Session = Depends(get_db)):
+def get_posts(db: Session = Depends(get_db),
+              user_id : int = Depends(get_current_user)):
     # cursor.execute(""" SELECT * FROM posts """)
     # posts = cursor.fetchall()
     posts = db.query(models.Post).all()
     return posts
 
 @router.get("/{id}", response_model=schemas.Post)                       #path with path parameter
-def get_post(id: int, db : Session = Depends(get_db)):  #path operation function
+def get_post(id: int, db : Session = Depends(get_db),
+             user_id : int = Depends(get_current_user)):  #path operation function
     # cursor.execute(""" SELECT * FROM posts WHERE id = %s """, (id,))
     # post = cursor.fetchone()
     post = db.query(models.Post).filter(models.Post.id == id).first()
@@ -45,7 +47,8 @@ def create_post(post: schemas.PostCreate, db: Session = Depends(get_db),
     return new_post
     
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, db : Session = Depends(get_db)):
+def delete_post(id: int, db : Session = Depends(get_db),
+                user_id : int = Depends(get_current_user)):
     # cursor.execute(""" DELETE FROM posts WHERE id =%s RETURNING * """, (id,))
     # deleted_post = cursor.fetchone()
     # conn.commit()
@@ -60,7 +63,8 @@ def delete_post(id: int, db : Session = Depends(get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 @router.put("/{id}", response_model=schemas.Post)
-def update_post(id: int, post: schemas.PostCreate, db : Session = Depends(get_db)):
+def update_post(id: int, post: schemas.PostCreate, db : Session = Depends(get_db),
+                user_id : int = Depends(get_current_user)):
     # cursor.execute(""" UPDATE posts SET title = %s, content = %s, published = %s
     #                 WHERE id = %s RETURNING * """, 
     #                 (post.title, post.content, post.published, id))
