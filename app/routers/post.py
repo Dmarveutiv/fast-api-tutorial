@@ -13,7 +13,7 @@ router = APIRouter(
 
 @router.get("/", response_model=List[schemas.Post])  # route
 def get_posts(db: Session = Depends(get_db),
-              user_id : int = Depends(get_current_user)):
+              current_user : int = Depends(get_current_user)):
     # cursor.execute(""" SELECT * FROM posts """)
     # posts = cursor.fetchall()
     posts = db.query(models.Post).all()
@@ -21,7 +21,7 @@ def get_posts(db: Session = Depends(get_db),
 
 @router.get("/{id}", response_model=schemas.Post)                       #path with path parameter
 def get_post(id: int, db : Session = Depends(get_db),
-             user_id : int = Depends(get_current_user)):  #path operation function
+             current_user : int = Depends(get_current_user)):  #path operation function
     # cursor.execute(""" SELECT * FROM posts WHERE id = %s """, (id,))
     # post = cursor.fetchone()
     post = db.query(models.Post).filter(models.Post.id == id).first()
@@ -33,7 +33,7 @@ def get_post(id: int, db : Session = Depends(get_db),
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
 def create_post(post: schemas.PostCreate, db: Session = Depends(get_db), 
-                user_id : int = Depends(get_current_user)):  #path operation function
+                current_user : int = Depends(get_current_user)):  #path operation function
     # cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s,%s,%s) RETURNING * """, 
     #                (post.title, post.content, post.published))
     # new_post = cursor.fetchone()
@@ -48,7 +48,7 @@ def create_post(post: schemas.PostCreate, db: Session = Depends(get_db),
     
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int, db : Session = Depends(get_db),
-                user_id : int = Depends(get_current_user)):
+               current_user : int = Depends(get_current_user)):
     # cursor.execute(""" DELETE FROM posts WHERE id =%s RETURNING * """, (id,))
     # deleted_post = cursor.fetchone()
     # conn.commit()
@@ -64,7 +64,7 @@ def delete_post(id: int, db : Session = Depends(get_db),
 
 @router.put("/{id}", response_model=schemas.Post)
 def update_post(id: int, post: schemas.PostCreate, db : Session = Depends(get_db),
-                user_id : int = Depends(get_current_user)):
+                current_user : int = Depends(get_current_user)):
     # cursor.execute(""" UPDATE posts SET title = %s, content = %s, published = %s
     #                 WHERE id = %s RETURNING * """, 
     #                 (post.title, post.content, post.published, id))
