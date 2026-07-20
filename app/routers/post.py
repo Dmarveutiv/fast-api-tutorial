@@ -17,6 +17,7 @@ def get_posts(db: Session = Depends(get_db),
     # cursor.execute(""" SELECT * FROM posts """)
     # posts = cursor.fetchall()
     posts = db.query(models.Post).all()
+    
     return posts
 
 @router.get("/{id}", response_model=schemas.Post)                       #path with path parameter
@@ -25,9 +26,11 @@ def get_post(id: int, db : Session = Depends(get_db),
     # cursor.execute(""" SELECT * FROM posts WHERE id = %s """, (id,))
     # post = cursor.fetchone()
     post = db.query(models.Post).filter(models.Post.id == id).first()
+    
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Post with the id '{id}' was not found")
+        
     return post
 
 
@@ -39,8 +42,8 @@ def create_post(post: schemas.PostCreate, db: Session = Depends(get_db),
     # new_post = cursor.fetchone()
     
     # conn.commit()
-
-    new_post = models.Post(**post.dict())
+    new_post = models.Post(owner_id=current_user.id, **post.dict())
+    
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
@@ -52,12 +55,20 @@ def delete_post(id: int, db : Session = Depends(get_db),
     # cursor.execute(""" DELETE FROM posts WHERE id =%s RETURNING * """, (id,))
     # deleted_post = cursor.fetchone()
     # conn.commit()
+    
     post = db.query(models.Post).filter(models.Post.id == id)
+    
     if post.first() == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail=f"Post with the id of '{id}' does not exist")
+        
+    if post.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Not Authorized To Perform This Action")
+        
     
     post.delete(synchronize_session=False)
+    
     db.commit()
     
     return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -73,9 +84,14 @@ def update_post(id: int, post: schemas.PostCreate, db : Session = Depends(get_db
     post_query = db.query(models.Post).filter(models.Post.id == id)
     
     up_post = post_query.first()
+    
     if up_post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail=f"Post with the id of '{id}' does not exist")
+        
+    if up_post.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Not Authorized To Perform This Action")
         
     post_query.update(post.dict(), synchronize_session=False)
     
