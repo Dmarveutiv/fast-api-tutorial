@@ -56,9 +56,12 @@ def delete_post(id: int, db : Session = Depends(get_db),
     # deleted_post = cursor.fetchone()
     # conn.commit()
     
-    post = db.query(models.Post).filter(models.Post.id == id)
+    post_query = db.query(models.Post).filter(models.Post.id == id)
     
-    if post.first() == None:
+    post = post_query.first()
+   
+    
+    if post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail=f"Post with the id of '{id}' does not exist")
         
@@ -67,7 +70,7 @@ def delete_post(id: int, db : Session = Depends(get_db),
                             detail="Not Authorized To Perform This Action")
         
     
-    post.delete(synchronize_session=False)
+    post_query.delete(synchronize_session=False)
     
     db.commit()
     
