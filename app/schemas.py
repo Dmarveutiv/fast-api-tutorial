@@ -29,6 +29,10 @@ class Post(PostBase):
     id : int
     owner : User
     
+class VotePost(BaseModel):
+    Post : Post
+    Likes : int
+    
     
 class UserCreate(BaseModel):
     email : EmailStr
