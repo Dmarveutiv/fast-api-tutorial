@@ -10,10 +10,15 @@ db_pass=os.getenv('DB_pass')
 db_host=os.getenv('DB_host')
 db_user=os.getenv('DB_user')
 db=os.getenv('DB')
+url = os.getenv('DATABASE_URL')
 
-SQLALCHEMY_DATABASE_URL = f'postgresql://{db_user}:{db_pass}@{db_host}/{db}'
+# SQLALCHEMY_DATABASE_URL = f'postgresql://{db_user}:{db_pass}@{db_host}/{db}'
+DATABASE_URL = url
+if DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://")
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)  #connect orm to db
+
+engine = create_engine(DATABASE_URL)  #connect orm to db
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine) #connect orm to py app
 
