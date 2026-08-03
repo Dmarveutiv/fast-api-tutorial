@@ -1,0 +1,18 @@
+[Unit]
+Description=FastAPI Application
+After=network.target postgresql.service
+
+[Service]
+Type=notify
+User=daniel
+Group=daniel
+WorkingDirectory=/home/daniel/app/src
+Environment="PATH=/home/daniel/app/venv/bin"
+Environment="DATABASE_URL=postgresql://postgres:2005@localhost:5432/postgres"
+Environment="SECRET_KEY=6d113339c4073c706d0f4d4214d028160d2c69e88c8898f4382e7ccf9c11a719"
+ExecStart=/home/daniel/app/venv/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:9000 app.main:app
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
