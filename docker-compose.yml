@@ -1,5 +1,8 @@
 version: 'v5.1.4'
 
+volumes:
+  postgres-db:  
+  
 services:
   api:
     image: fastapi:latest
@@ -7,3 +10,20 @@ services:
       - "9000:9000"
     env_file:
       - ./.env
+
+  
+  postgres:
+    image: postgres
+
+    env_file:
+      - ./.env
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+
+ 
+    
+     
