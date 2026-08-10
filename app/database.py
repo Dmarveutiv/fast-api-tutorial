@@ -17,8 +17,8 @@ DATABASE_URL = url
 if DATABASE_URL:
     DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://")
 
-
-engine = create_engine(DATABASE_URL)  #connect orm to db
+engine = create_engine(DATABASE_URL) #connect orm to db
+# engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine) #connect orm to py app
 
