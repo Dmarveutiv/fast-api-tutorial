@@ -1,0 +1,9 @@
+version: 'v5.1.4'
+
+services:
+  api:
+    image: fastapi:latest
+    ports:
+      - "9000:9000"
+    env_file:
+      - ./.env
