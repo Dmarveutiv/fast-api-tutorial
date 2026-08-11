@@ -5,19 +5,20 @@ volumes:
 
 services:
   api:
-    image: fastapi:latest
+    image: bgbatsy/fastapi:v1
     ports:
-      - "9000:9000"
+      - "80:9000"
     env_file:
       - ./.env
+    # command: uvicorn app.main:app --host 0.0.0.0 --port 9000
 
 
   postgres:
     image: postgres
 
     environment:
-      - POSTGRES_PASSWORD=2005
-      - POSTGRES_DB=fastapi
+      - POSTGRES_PASSWORD=$(psp)
+      - POSTGRES_DB=$(psdb)
 
     env_file:
       - ./.env
@@ -25,7 +26,3 @@ services:
       - "5432:5432" 
     volumes:
       - postgres-db:/var/lib/postgresql
-
- 
-    
-     

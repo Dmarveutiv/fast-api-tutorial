@@ -23,7 +23,7 @@ app.include_router(votes.router)
         
 @app.get("/")  # home route
 def root():
-    return {"message" : "Hello World"}
+    return {"message" : "HELLO WORLD"}
 
 
 
