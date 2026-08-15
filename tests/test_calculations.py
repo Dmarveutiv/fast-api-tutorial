@@ -32,13 +32,25 @@ def test_deposit(get_bank_user):
 def test_withdraw(get_bank_user):
     get_bank_user.withdraw(30)
     assert get_bank_user.balance == 20
-    
+ 
+
+
 def test_history(get_bank_user):
-    bb = BankAccount(50, 'dan')
     get_bank_user.deposit(40)
     get_bank_user.withdraw(20)
     get_bank_user.deposit(20)
     assert get_bank_user.history == [90,70,90]
+    
+    
+@pytest.mark.parametrize("n1, n2, expected", argvalues=[
+    (40, 20, [90, 70]),
+    (20, 20, [70, 50]),
+    (40, 70, [90, 20])
+])
+def test_trans(get_bank_user, n1, n2,expected):
+    get_bank_user.deposit(n1)
+    get_bank_user.withdraw(n2)
+    assert get_bank_user.history == expected
     
     
     

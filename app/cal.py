@@ -30,22 +30,19 @@ class BankAccount():
         return f'your new balance {self.balance}'
     
     def withdraw(self, amount: int):
-        if amount <= self.balance:
+        if amount <= self.balance and amount > 0:
             self.balance-=amount
             self.history.append(self.balance)
-        return f'You withdrew {amount} and your new balance is {self.balance}'
+            return f'You withdrew {amount} and your new balance is {self.balance}'
+        elif self.balance < amount:
+            raise Exception("thief")
     
     def check_balance(self):
-        return self.history
+        return {"trans":self.history}
     
-
-
-
-
-
-bb = BankAccount(50, 'dan')
+bb= BankAccount(50, "dan")
 bb.deposit(40)
-bb.withdraw(20)
-bb.deposit(20)
+bb.withdraw(38)
+bb.withdraw(-4)
+print(bb.check_balance())
 
-print(bb.history)
