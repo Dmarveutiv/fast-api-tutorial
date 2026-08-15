@@ -20,7 +20,7 @@ class BankAccount():
         acct_no = "".join(random.choice("0123456789") for _ in range(10))
         self.history.append(acct_no)
         return f'for user: {self.user} acct no is :{acct_no}'
-    
+        
         
     def deposit(self, amount: int):
         if amount > 0:
@@ -37,3 +37,15 @@ class BankAccount():
     
     def check_balance(self):
         return self.history
+    
+
+
+
+
+
+bb = BankAccount(50, 'dan')
+bb.deposit(40)
+bb.withdraw(20)
+bb.deposit(20)
+
+print(bb.history)
