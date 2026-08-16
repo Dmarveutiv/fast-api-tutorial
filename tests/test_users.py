@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+import pytest
 from app.main import app
 from app import schemas
 from app.database import get_db, Base
@@ -26,27 +27,33 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL) #connect orm to db
 
 TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine) #connect orm to py app
 
-Base.metadata.create_all(bind=engine)
 
-
-def over_get_db():
+@pytest.fixture
+def session():
+    Base.metadata.create_all(bind=engine)
     db = TestSessionLocal()
     try:
-        yield db
+            yield db
     finally:
-        db.close()
-        
+            db.close()
+    Base.metadata.drop_all(bind=engine)
 
-app.dependency_overrides[get_db] = over_get_db
-
-
-client = TestClient(app)
-
-def test_root():
+@pytest.fixture
+def client(session):
+    def over_get_db():
+    
+        try:
+            yield session
+        finally:
+            session.close()
+    app.dependency_overrides[get_db] = over_get_db
+    yield TestClient(app)
+    
+def test_root(client, session):
     res = client.get('/')
     print(res.json().get('message'))
     
-def test_user():
+def test_user(client, session):
     res = client.post('/users',
                       json={"email": "kdee@gmail.com", "password": "2005"})
     
