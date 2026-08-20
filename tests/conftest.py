@@ -3,7 +3,7 @@ import pytest
 from app.main import app
 from app.database import get_db, Base
 from sqlalchemy import create_engine
-# from sqlalchemy.ext.declarative import declarative_base
+from app.oauth2 import create_access_token
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 import os
@@ -59,3 +59,16 @@ def login_user(client):
     new_user['password'] = user_data['password']
     new_user['email'] = user_data['email']
     return new_user
+
+@pytest.fixture
+def token(login_user):
+    return create_access_token({"user_id": login_user['id']})
+
+@pytest.fixture
+def authorized_client(token, client):
+    client.headers = {
+        **client.headers,
+        "Authorization": f'Bearer {token} '
+    }
+    
+    return client
