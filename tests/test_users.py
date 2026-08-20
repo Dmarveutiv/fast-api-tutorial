@@ -1,6 +1,20 @@
 from app import schemas
-from .database import client, session
 import pytest
+import jwt
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+key = os.getenv('key')
+algo = os.getenv('algo')
+
+if not key:
+    raise ValueError("SECRET_KEY environment variable is not set!")
+
+SECRET_KEY = key
+ALGORITHM= algo
+
 
 
 @pytest.fixture
@@ -30,5 +44,11 @@ def test_user(client, session):
 def test_login(client, login_user):
     res = client.post('/login',
                       data={"username": login_user['email'], "password": login_user['password']})
+    login_res = schemas.Token(**res.json())
     
+    payload = jwt.decode(login_res.access_token, SECRET_KEY, algorithms=[ALGORITHM])
+    id : int | None = payload.get("user_id")
+    
+    assert id == login_user['id']
+    assert login_res.token_type == 'bearer'
     assert res.status_code == 200
