@@ -7,6 +7,7 @@ from app.oauth2 import create_access_token
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 import os
+from app import models
 
 load_dotenv()
 
@@ -54,7 +55,6 @@ def login_user(client):
     res = client.post('/users/', json=user_data)
       
     assert res.status_code == 201
-    print(res.json())
     new_user = res.json()
     new_user['password'] = user_data['password']
     new_user['email'] = user_data['email']
@@ -72,3 +72,34 @@ def authorized_client(token, client):
     }
     
     return client
+
+@pytest.fixture
+def put_posts(login_user, session):
+    posts_data = [
+        {
+            "title": "title 1",
+            "content": "content 1",
+            "owner_id": login_user['id']
+        },
+        {
+            "title": "title 2",
+            "content": "content 2",
+            "owner_id": login_user['id']
+        }
+        
+    ]
+    
+    def create_post_model(post):
+       x =  models.Post(**post)
+       
+       return x
+        
+    post_map = map(create_post_model, posts_data)
+    posts = list(post_map)
+    
+    session.add_all(posts)
+    session.commit()
+    
+    posts = session.query(models.Post).all()
+    
+    return posts
