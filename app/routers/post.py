@@ -32,14 +32,15 @@ def get_post(id: int, db : Session = Depends(get_db),
              current_user : int = Depends(get_current_user)):  #path operation function 
     
     
-    post, likes = db.query(models.Post, func.count(models.Vote.post_id).label("likes")).join(models.Vote,
+    result = db.query(models.Post, func.count(models.Vote.post_id).label("likes")).join(models.Vote,
              models.Post.id == models.Vote.post_id,
             isouter=True).group_by(models.Post.id).filter(models.Post.id == id).first()
     
-    if not post:
+    if not result:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Post with the id '{id}' was not found")
-        
+     
+    post, likes = result  
     return {"Post": post, "Likes": likes}
 
 
