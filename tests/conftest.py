@@ -85,6 +85,11 @@ def put_posts(login_user, session):
             "title": "title 2",
             "content": "content 2",
             "owner_id": login_user['id']
+        },
+                {
+            "title": "title 3",
+            "content": "content 3",
+            "owner_id": login_user['id']
         }
         
     ]
