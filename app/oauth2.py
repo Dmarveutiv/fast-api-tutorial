@@ -1,6 +1,6 @@
 import jwt
 from jwt.exceptions import InvalidTokenError
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC, timezone
 from dotenv import load_dotenv
 import os
 from app.schemas import TokenData
@@ -28,7 +28,7 @@ ACCESS_TOKEN_EXPIRES_MINUTES = 60
 def create_access_token(data : dict):
     
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRES_MINUTES)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRES_MINUTES)
     to_encode.update({"exp" : expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     
