@@ -9,4 +9,4 @@ jobs:
       - name: pulls git repo
         uses: action/checkout@v4
       - name: say hi to daniel
-        run: echo "hi daniel"
+        run: echo "hi daniel"s
