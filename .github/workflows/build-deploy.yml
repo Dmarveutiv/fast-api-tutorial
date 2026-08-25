@@ -4,6 +4,16 @@ on: [push, pull_request]
 
 jobs:
  job1:
+    env:
+      DB_pass: 2005
+      DB_user: postgres
+      DB_host: localhost
+      DB: fastapi
+      key: 6d113339c4073c706d0f4d4214d028160d2c69e88c8898f4382e7ccf9c11a719
+      algo: HS256
+      DATABASE_URL: postgresql://postgres:2005@localhost:5432/fastapi
+      psp: 2005
+      psdb: fastapi
     runs-on: ubuntu-latest
     steps:
       - name: pulls git repo
