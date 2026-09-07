@@ -22,7 +22,7 @@ if not secret_key:
     raise ValueError("SECRET_KEY environment variable is not set!")
 
 SECRET_KEY = secret_key
-ALGORITHM = algorithm
+ALGORITHM = algorithm or ''
 ACCESS_TOKEN_EXPIRES_MINUTES = 60
 
 def create_access_token(data : dict):
