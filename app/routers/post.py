@@ -5,6 +5,7 @@ from sqlalchemy import func
 from app.database import get_db
 from typing import List, Optional
 from app.oauth2 import get_current_user
+from app.models import User
 
 router = APIRouter(
     prefix="/posts",
@@ -46,7 +47,7 @@ def get_post(id: int, db : Session = Depends(get_db),
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
 def create_post(post: schemas.PostCreate, db: Session = Depends(get_db), 
-                current_user : int = Depends(get_current_user)):  #path operation function
+                current_user : User = Depends(get_current_user)):  #path operation function
     
     
     new_post = models.Post(owner_id=current_user.id, **post.model_dump())
@@ -58,7 +59,7 @@ def create_post(post: schemas.PostCreate, db: Session = Depends(get_db),
     
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int, db : Session = Depends(get_db),
-               current_user : int = Depends(get_current_user)):
+               current_user : User = Depends(get_current_user)):
     
 
     post_query = db.query(models.Post).filter(models.Post.id == id)
@@ -83,7 +84,7 @@ def delete_post(id: int, db : Session = Depends(get_db),
 
 @router.put("/{id}", response_model=schemas.Post)
 def update_post(id: int, post: schemas.PostCreate, db : Session = Depends(get_db),
-                current_user : int = Depends(get_current_user)):
+                current_user : User = Depends(get_current_user)):
     
     
     post_query = db.query(models.Post).filter(models.Post.id == id)
